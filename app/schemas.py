@@ -28,9 +28,10 @@ class LinkCreate(BaseModel):
     @classmethod
     def validate_expires_at(cls, v):
         if v is not None:
-            # текущее время с timezone UTC
-            now = datetime.now(timezone.utc)
-            if v < now:
+            # Если datetime naive, считаем, что оно в UTC
+            if v.tzinfo is None:
+                v = v.replace(tzinfo=timezone.utc)
+            if v < datetime.now(timezone.utc):
                 raise ValueError('expires_at must be in the future')
         return v
 
